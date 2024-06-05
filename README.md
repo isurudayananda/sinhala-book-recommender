@@ -22,6 +22,8 @@ server through a dedicated communication channel. The server houses the core fun
 model. This model, trained on a comprehensive dataset of Sinhala literature and reader preferences, analyzes the received user data 
 to generate personalized book recommendations.
 
+![img](https://github.com/isurudayananda/sinhala-book-recommender/raw/main/img.png)
+
 Furthermore, the server interacts with external data sources, such as online bookstore websites, to retrieve information on the 
 availability of the recommended books. This information might include links to purchase the books online or details of nearby physical 
 bookstores that stock them. Finally, the processed data, encompassing both book recommendations and bookstore information, is sent back 
@@ -34,7 +36,6 @@ The development of this mobile application will follow a structured, iterative a
 through distinct stages, with each stage building upon the previous one. Throughout the process, testing and feedback will be 
 incorporated to ensure the application meets user needs and delivers a positive experience.
 
-![img](https://github.com/isurudayananda/sinhala-book-recommender/raw/main/img.png)
 
 - An iterative development approach will be followed. The first step involves data collection and preparation. This includes gathering 
 a comprehensive dataset of Sinhala literature (books, authors, genres) and reader preferences (reading habits, ratings). The data 
