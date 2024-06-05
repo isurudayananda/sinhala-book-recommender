@@ -81,22 +81,20 @@ the accuracy of the machine learning model over time, leading to more personaliz
 
 The development of this application will utilize various technologies to achieve its functionalities:
 
-Mobile App Development: A popular cross-platform mobile app development framework will be used to create the mobile application, ensuring 
-it functions seamlessly on both Android and iOS devices.
+- Mobile App Development: A popular cross-platform mobile app development framework will be used to create the mobile application, ensuring it functions seamlessly on both Android and iOS devices.
 
-API Development (Abstract): A well-suited technology will be used to create a communication layer that facilitates interaction between 
+- API Development (Abstract): A well-suited technology will be used to create a communication layer that facilitates interaction between 
 the mobile app and the server. This layer will ensure secure data transfer.
 
-Machine Learning Libraries (Abstract): Popular machine learning libraries will be used to develop the machine learning model. These 
+- Machine Learning Libraries (Abstract): Popular machine learning libraries will be used to develop the machine learning model. These 
 libraries provide powerful tools for model creation, training, and data manipulation.
 
-Data Storage (Abstract): A flexible and scalable database solution will be used to store user data and potentially book information.
+- Data Storage (Abstract): A flexible and scalable database solution will be used to store user data and potentially book information.
 
-UI/UX Design (Abstract): A user-friendly design tool will be used to design the interface and user experience of the mobile app, ensuring 
-an intuitive and enjoyable experience for users.
+- UI/UX Design (Abstract): A user-friendly design tool will be used to design the interface and user experience of the mobile app, ensuring an intuitive and enjoyable experience for users.
 
-Web Scraping (Potential): If necessary, techniques might be employed to gather book availability data from online bookstores that don't 
+- Web Scraping (Potential): If necessary, techniques might be employed to gather book availability data from online bookstores that don't 
 offer APIs.
 
-Map Services/Local Business Directories (Potential): To find nearby physical bookstores selling the recommended books, integration with 
+- Map Services/Local Business Directories (Potential): To find nearby physical bookstores selling the recommended books, integration with 
 map services or local business directories might be explored.
