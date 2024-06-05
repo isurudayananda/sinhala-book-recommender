@@ -34,7 +34,7 @@ The development of this mobile application will follow a structured, iterative a
 through distinct stages, with each stage building upon the previous one. Throughout the process, testing and feedback will be 
 incorporated to ensure the application meets user needs and delivers a positive experience.
 
-![img]('https://github.com/isurudayananda/sinhala-book-recommender/blob/main/img.png')
+![img]('https://github.com/isurudayananda/sinhala-book-recommender/raw/main/img.png')
 
 - An iterative development approach will be followed. The first step involves data collection and preparation. This includes gathering 
 a comprehensive dataset of Sinhala literature (books, authors, genres) and reader preferences (reading habits, ratings). The data 
