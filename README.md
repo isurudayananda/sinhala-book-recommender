@@ -1,4 +1,4 @@
-Sinhala Book Recommendation Mobile App (Initial Stage)
+# Sinhala Book Recommendation Mobile App
 
 ## Introduction
 
