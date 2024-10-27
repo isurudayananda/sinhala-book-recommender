@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:login_signup/screens/LoginPage.dart';
-import 'package:login_signup/screens/SignupPage.dart';
+import 'package:login_signup/screens/LoginPage.dart'; // Import LoginPage
+import 'package:login_signup/screens/SignupPage.dart'; // Import SignupPage
+import 'package:login_signup/screens/HomePage.dart'; // Import HomePage
 
 void main() {
-  var devicePre = true;
+  var devicePre = true; // Set this to false when you no longer need device preview
 
   if (devicePre) {
     runApp(DevicePreview(
@@ -21,10 +22,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      useInheritedMediaQuery: true, // Required for DevicePreview
       debugShowCheckedModeBanner: false,
       title: 'Sinhala Book Recommendation App',
-      home: LoginPage(),
+      // Directly start the app with HomePage to see its output
+      home: HomePage(
+        preferences: ['Senkottan', 'Madol Duwa'], // Provide sample preferences for testing
+      ),
+      routes: {
+        '/login': (context) => const LoginPage(), // LoginPage route
+        '/signup': (context) => const SignupPage(), // SignupPage route
+        '/home': (context) => HomePage(preferences: ['Senkottan', 'Madol Duwa']), // HomePage route
+      },
+      builder: DevicePreview.appBuilder, // Enables DevicePreview for responsiveness
     );
   }
 }
