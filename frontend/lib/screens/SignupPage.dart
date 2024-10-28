@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'HomePage.dart'; // Import the HomePage widget
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -249,7 +250,13 @@ class _SignupPageState extends State<SignupPage> {
                                   pageIndex += 1;
                                 });
                               } else {
-                                // Add signup logic here
+                                // Pass the selected categories to HomePage on signing up
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(preferences: _selectedCategories),
+                                  ),
+                                );
                               }
                             },
                             child: Text(pageIndex < 2 ? "Next >" : "Sign Up"),
