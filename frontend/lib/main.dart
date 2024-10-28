@@ -11,7 +11,6 @@ void main() {
     runApp(DevicePreview(
       builder: (context) => const MyApp(),
     ));
-  // ignore: dead_code
   } else {
     runApp(const MyApp());
   }
@@ -26,14 +25,12 @@ class MyApp extends StatelessWidget {
       useInheritedMediaQuery: true, // Required for DevicePreview
       debugShowCheckedModeBanner: false,
       title: 'Sinhala Book Recommendation App',
-      // Directly start the app with HomePage to see its output
-      home: HomePage(
-        preferences: ['Senkottan', 'Madol Duwa'], // Provide sample preferences for testing
-      ),
+      // Start the app at the login page
+      home: const LoginPage(), // Set LoginPage as the initial screen
       routes: {
         '/login': (context) => const LoginPage(), // LoginPage route
         '/signup': (context) => const SignupPage(), // SignupPage route
-        '/home': (context) => HomePage(preferences: ['Senkottan', 'Madol Duwa']), // HomePage route
+        '/home': (context) => HomePage(preferences: ['Senkottan', 'Madol Duwa']), // HomePage route with sample preferences
       },
       builder: DevicePreview.appBuilder, // Enables DevicePreview for responsiveness
     );

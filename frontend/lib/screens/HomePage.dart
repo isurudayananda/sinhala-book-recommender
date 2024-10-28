@@ -24,23 +24,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 1,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Book Recommender"),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: "Recommender"),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildRecommenderTab(),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Sinhala Book Recommender"), // Updated title
       ),
+      body: _buildRecommenderTab(),
     );
   }
 
@@ -48,53 +36,70 @@ class _HomePageState extends State<HomePage> {
   Widget _buildRecommenderTab() {
     final recommendedBooks = _getRecommendedBooks();
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(10.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // 2 books per row
-        mainAxisSpacing: 10.0,
-        crossAxisSpacing: 10.0,
-        childAspectRatio: 2 / 3, // Aspect ratio for the book cover
-      ),
-      itemCount: recommendedBooks.length,
-      itemBuilder: (BuildContext context, int index) {
-        return GestureDetector(
-          onTap: () {
-            // Navigate to BookDetails when tapped
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BookDetails(book: recommendedBooks[index]),
-              ),
-            );
-          },
-          child: Card(
-            elevation: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Expanded(
-                  child: Image.asset(
-                    recommendedBooks[index]['image'],
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    recommendedBooks[index]['title'],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            "Here's your book recommendations",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        );
-      },
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(10.0),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, // 2 books per row
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              childAspectRatio: 2 / 3, // Aspect ratio for the book cover
+            ),
+            itemCount: recommendedBooks.length,
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                onTap: () {
+                  // Navigate to BookDetails when tapped
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookDetails(book: recommendedBooks[index]),
+                    ),
+                  );
+                },
+                child: Card(
+                  elevation: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Expanded(
+                        child: Image.asset(
+                          recommendedBooks[index]['image'],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          recommendedBooks[index]['title'],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
