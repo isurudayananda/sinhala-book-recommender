@@ -259,11 +259,12 @@ class _SignupPageState extends State<SignupPage> {
                                 );
                               }
                             },
-                            child: Text(pageIndex < 2 ? "Next >" : "Sign Up"),
+                            child: Text(pageIndex < 2 ? " Next " : " Sign Up "),
                             style: ElevatedButton.styleFrom(
                               shape: const StadiumBorder(),
                               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                              backgroundColor: Colors.purple,
+                               backgroundColor:  const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+                                foregroundColor: const Color.fromARGB(255, 47, 3, 245),
                             ),
                           ),
                         ],

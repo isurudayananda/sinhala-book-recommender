@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Sinhala Book Recommendation App',
       // Start the app at the login page
-      home: const LoginPage(), // Set LoginPage as the initial screen
+      home: const HomePage(preferences: ['Senkottan', 'Madol Duwa']), // Set LoginPage as the initial screen
       routes: {
         '/login': (context) => const LoginPage(), // LoginPage route
         '/signup': (context) => const SignupPage(), // SignupPage route

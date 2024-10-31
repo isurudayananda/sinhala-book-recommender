@@ -72,11 +72,13 @@ class LoginPage extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             shape: const StadiumBorder(),
             padding: const EdgeInsets.symmetric(vertical: 16),
-            backgroundColor: Colors.purple,
+            backgroundColor:  const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+            foregroundColor: const Color.fromARGB(255, 47, 3, 245),
           ),
           child: const Text(
             "Login",
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20,),
+            
           ),
         )
       ],
@@ -87,7 +89,7 @@ class LoginPage extends StatelessWidget {
     return TextButton(
       onPressed: () {},
       child: const Text("Forgot password?",
-        style: TextStyle(color: Colors.purple),
+        style: TextStyle(color:  Color.fromARGB(255, 47, 3, 245)),
       ),
     );
   }
@@ -102,7 +104,7 @@ class LoginPage extends StatelessWidget {
               Navigator.push(context, 
               MaterialPageRoute(builder: (context) => const SignupPage()));
             },
-            child: const Text("Sign Up", style: TextStyle(color: Colors.purple),)
+            child: const Text("Sign Up", style: TextStyle(color: Color.fromARGB(255, 47, 3, 245)),)
         )
       ],
     );
