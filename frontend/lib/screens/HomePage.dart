@@ -1,41 +1,91 @@
 import 'package:flutter/material.dart';
-import 'BookDetails.dart'; // Import the BookDetails page
+import 'package:dio/dio.dart';
+import 'BookDetails.dart';
+import 'package:provider/provider.dart';
+import '../main.dart';
 
 class HomePage extends StatefulWidget {
-  final List<String> preferences; // Accept preferences as user input
-
   const HomePage({Key? key, required this.preferences}) : super(key: key);
+
+  final List<String> preferences;
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Map<String, dynamic>> _books = [
-    {'title': 'Senkottan', 'image': 'assets/images/senkottan.jpg', 'rating': 4.5},
-    {'title': 'Manikkawatha', 'image': 'assets/images/manikkawatha.jpg', 'rating': 4.7},
-    {'title': 'Madol Duwa', 'image': 'assets/images/madol_duwa.jpg', 'rating': 4.8},
-  ];
+  List<Map<String, dynamic>> _books = [];
+  bool _isLoading = true;
 
-  // Filter books based on user preferences
-  List<Map<String, dynamic>> _getRecommendedBooks() {
-    return _books.where((book) => widget.preferences.contains(book['title'])).toList();
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecommendations();
+  }
+
+  Future<void> _fetchRecommendations() async {
+    final token = Provider.of<AuthState>(context, listen: false).token;
+    if (token == null) {
+      _showSnackBar('Authentication required');
+      return;
+    }
+
+    try {
+      var dio = Dio();
+      final response = await dio.get(
+        'http://localhost:8000/api/books/get-recommendations',
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        
+        // Wrap the data in a list if the response is a single object
+        final books = data is List ? data : [data];
+        
+        setState(() {
+          _books = books.map((book) {
+            return {
+              'title': book['Book_Name'],
+              'author': book['Author'],
+              'category': book['Category'],
+              'url': book['URL'],
+              'img_url': book['img_url'],
+            };
+          }).toList();
+          _isLoading = false;
+        });
+      } else {
+        _showSnackBar('Failed to fetch recommendations');
+      }
+    } catch (e) {
+      _showSnackBar('Error fetching recommendations: $e');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sinhala Book Recommender"), // Updated title
+        title: const Text("Sinhala Book Recommender"),
       ),
-      body: _buildRecommenderTab(),
+      body: _isLoading ? _buildLoading() : _buildRecommenderTab(),
     );
   }
 
-  // Recommender Tab
-  Widget _buildRecommenderTab() {
-    final recommendedBooks = _getRecommendedBooks();
+  Widget _buildLoading() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
 
+  Widget _buildRecommenderTab() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,20 +103,20 @@ class _HomePageState extends State<HomePage> {
           child: GridView.builder(
             padding: const EdgeInsets.all(10.0),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 books per row
+              crossAxisCount: 2,
               mainAxisSpacing: 10.0,
               crossAxisSpacing: 10.0,
-              childAspectRatio: 2 / 3, // Aspect ratio for the book cover
+              childAspectRatio: 2 / 3,
             ),
-            itemCount: recommendedBooks.length,
+            itemCount: _books.length,
             itemBuilder: (BuildContext context, int index) {
+              final book = _books[index];
               return GestureDetector(
                 onTap: () {
-                  // Navigate to BookDetails when tapped
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BookDetails(book: recommendedBooks[index]),
+                      builder: (context) => BookDetails(book: book),
                     ),
                   );
                 },
@@ -76,15 +126,18 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       Expanded(
-                        child: Image.asset(
-                          recommendedBooks[index]['image'],
+                        child: Image.network(
+                          book['img_url'],
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.broken_image, size: 50);
+                          },
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          recommendedBooks[index]['title'],
+                          book['title'],
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
