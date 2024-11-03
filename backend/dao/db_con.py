@@ -65,6 +65,12 @@ def get_book(book_id):
     return Book.from_dict(book_data) if book_data else None
 
 
+def get_book_info_by_name(book_name): 
+    book_data = book_collection.find_one({"Book_Name": book_name})
+    print(book_data)
+    return Book.from_dict(book_data) if book_data else None
+
+
 def get_book_by_isbn(isbn):
     book_data = book_collection.find_one({"ISBN": int(isbn)})
     print(book_data)
