@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:login_signup/screens/LoginPage.dart'; // Import LoginPage
-import 'package:login_signup/screens/SignupPage.dart'; // Import SignupPage
-import 'package:login_signup/screens/HomePage.dart'; // Import HomePage
+import 'package:login_signup/screens/LoginPage.dart'; 
+import 'package:login_signup/screens/SignupPage.dart';
+import 'package:login_signup/screens/HomePage.dart'; 
+import 'package:provider/provider.dart';
+
+
+class AuthState with ChangeNotifier {
+  String? _token;
+
+  String? get token => _token;
+
+  void setToken(String? token) {
+    _token = token;
+    notifyListeners();
+  }
+}
 
 void main() {
-  var devicePre = true; // Set this to false when you no longer need device preview
-
-  if (devicePre) {
-    runApp(DevicePreview(
-      builder: (context) => const MyApp(),
-    ));
-  } else {
-    runApp(const MyApp());
-  }
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthState(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,12 +31,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var devicePre = true;
     return MaterialApp(
       useInheritedMediaQuery: true, // Required for DevicePreview
       debugShowCheckedModeBanner: false,
       title: 'Sinhala Book Recommendation App',
       // Start the app at the login page
-      home: const HomePage(preferences: ['Senkottan', 'Madol Duwa']), // Set LoginPage as the initial screen
+      home: const LoginPage(), // Set LoginPage as the initial screen
       routes: {
         '/login': (context) => const LoginPage(), // LoginPage route
         '/signup': (context) => const SignupPage(), // SignupPage route
