@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
               'author': book['Author'],
               'category': book['Category'],
               'url': book['URL'],
-              'img_url': book['img_url'],
+              'image_url': book['image_url'],
             };
           }).toList();
           _isLoading = false;
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Expanded(
                         child: Image.network(
-                          book['img_url'],
+                          book['image_url'],
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return const Icon(Icons.broken_image, size: 50);
