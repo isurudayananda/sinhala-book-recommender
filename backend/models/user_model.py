@@ -1,10 +1,10 @@
 from bson import ObjectId
 
 class User:
-    def __init__(self, _id=None, username=None, password=None, email=None, gender=None, age=None, interested_categories=None):
+    def __init__(self, _id=None, username=None, hashed_password=None, email=None, gender=None, age=None, interested_categories=None):
         self._id = _id
         self.username = username
-        self.password = password
+        self.hashed_password = hashed_password
         self.email = email
         self.gender = gender
         self.age = age
@@ -14,7 +14,7 @@ class User:
         return {
             "_id": self._id,
             "username": self.username,
-            "password": self.password,
+            "hashed_password": self.hashed_password,
             "email": self.email,
             "gender": self.gender,
             "age": self.age,
@@ -26,7 +26,7 @@ class User:
         return cls(
             _id=data["_id"],
             username=data["username"],
-            password=data["password"],
+            hashed_password=data["hashed_password"],
             email=data["email"],
             gender=data["gender"],
             age=data["age"],

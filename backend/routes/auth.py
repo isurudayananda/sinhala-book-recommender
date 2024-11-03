@@ -5,11 +5,10 @@ from typing import Annotated
 from fastapi import APIRouter, Form, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from models.user_model import UserInDB
-
 from auth.authorize import authenticate_user, oauth2_scheme
-from auth.hashing import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, blacklist_token
-from services.user_service import user_exists, get_next_avail_id, add_new_user
+from auth.hashing import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from models.user_model import User
+from services.user_service import add_new_user, user_exists
 
 """
     API router for auth endpoint
@@ -40,35 +39,17 @@ async def register_user(
         username: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
-        is_admin=False
 ):
-    """
-    The endpoint for registering a new user
-
-    Args:
-        username (str): the username of the user
-        email (str): the email of the user
-        password (str): the password of the user
-        is_admin (bool): whether the user is an admin
-
-    Returns:
-        (UserInDB) The user that was registered
-
-    Raises:
-        HTTPException: if the username already exists
-    """
     if user_exists(username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already exists",
         )
     hashed_password = get_password_hash(password)
-    user = UserInDB(
-        id=get_next_avail_id(),
+    user = User(
         username=username,
         email=email,
         hashed_password=hashed_password,
-        is_admin=is_admin,
     )
     add_new_user(user)
     return user
@@ -105,18 +86,3 @@ async def login_for_access_token(
     )
 
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.post("/logout")
-async def logout(token: str = Depends(oauth2_scheme)):
-    """
-    The endpoint for logging out a user
-
-    Args:
-        token (oauth2 bearer token): the token for the user
-
-    Returns:
-        (dict) The message for logging out
-    """
-    blacklist_token(token)
-    return {"message": "Successfully logged out"}

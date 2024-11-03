@@ -1,24 +1,31 @@
+from dao.db_con import mydb
 from models.user_model import User
 
-from services.database_service import dao
+class UserService:
+    def get_user(self, username):
+        user_dict = mydb["users"].find_one({"username": username})
+        if user_dict:
+            return User.from_dict(user_dict)
+        else:
+            return None
+        
+    def user_exists(self, username):
+        user_dict = mydb["users"].find_one({"username": username})
+        return user_dict is not None
+    
+    def add_new_user(self, user: User):
+        user_dict = user.to_dict()
+        mydb["users"].insert_one(user_dict)
 
+user_service = UserService()
+
+
+def get_user(username):
+    return user_service.get_user(username)
+
+
+def user_exists(username):
+    return user_service.user_exists(username)
 
 def add_new_user(user: User):
-    dao.create_user(user)
-
-
-def user_exists(username: str) -> bool:
-    if get_user(username) is None:
-        return False
-    return True
-
-
-def get_next_avail_id() -> int:
-    last_id = dao.get_last_user_id()
-    if last_id is None:
-        return 1
-    return last_id + 1
-
-
-def get_user(username: str):
-    return dao.get_user_by_username(username)
+    user_service.add_new_user(user)
