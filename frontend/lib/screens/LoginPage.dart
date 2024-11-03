@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';    
 
 import 'package:flutter/material.dart';
 import 'package:login_signup/main.dart';
@@ -50,6 +51,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  postData(Map<String, dynamic> body) async {    
+    var dio = Dio();
+    FormData formData = new FormData.fromMap(body);
+    var response = await dio.post('http://localhost:8000/api/auth/login', data: formData);
+    return response.data;
+  }
+
   _inputField(context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -82,20 +90,16 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () async {
-            final username = _usernameController.text;
-            final password = _passwordController.text;
-
             try {
-              final response = await http.post(
-                Uri.parse('http://localhost:8000/api/auth/login'),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: jsonEncode({
-                  'username': username,
-                  'password': password,
-                }),
-              );
+              final username = _usernameController.text;
+              final password = _passwordController.text;
+
+              var response = await postData({
+                'username': username,
+                'password': password,
+              });
+
+              print('--------------------' + response);
 
               if (response.statusCode == 200) {
                 final jsonResponse = jsonDecode(response.body);
