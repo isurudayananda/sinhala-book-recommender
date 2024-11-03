@@ -1,8 +1,6 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';    
-
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // Import provider
 import 'package:login_signup/main.dart';
 import 'package:login_signup/screens/HomePage.dart';
 import 'package:login_signup/screens/Signuppage.dart';
@@ -20,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
@@ -51,11 +49,37 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  postData(Map<String, dynamic> body) async {    
+  Future<void> postData(Map<String, dynamic> body) async {
     var dio = Dio();
-    FormData formData = new FormData.fromMap(body);
-    var response = await dio.post('http://localhost:8000/api/auth/login', data: formData);
-    return response.data;
+    FormData formData = FormData.fromMap(body);
+
+    try {
+      var response = await dio.post('http://localhost:8000/api/auth/login', data: formData);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = response.data;
+        final accessToken = jsonResponse['access_token'];
+
+        // Use Provider to set the token
+        Provider.of<AuthState>(context, listen: false).setToken(accessToken);
+
+        // Navigate to HomePage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage(preferences: ['Senkottan', 'Madol Duwa'])),
+        );
+      } else {
+        _showSnackBar('Invalid credentials');
+      }
+    } catch (e) {
+      _showSnackBar('Error: $e');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   _inputField(context) {
@@ -90,43 +114,12 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () async {
-            try {
-              final username = _usernameController.text;
-              final password = _passwordController.text;
-
-              var response = await postData({
-                'username': username,
-                'password': password,
-              });
-
-              print('--------------------' + response);
-
-              if (response.statusCode == 200) {
-                final jsonResponse = jsonDecode(response.body);
-                final accessToken = jsonResponse['access_token'];
-                context.read<AuthState>().token = accessToken;
-
-                // Navigate to the HomePage if the login is successful
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage(preferences: ['Senkottan', 'Madol Duwa'])),
-                );
-              } else {
-                // Show an error message if the login fails
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Invalid credentials'),
-                  ),
-                );
-              }
-            } catch (e) {
-              // Show an error message if there's an error
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error: $e'),
-                ),
-              );
-            }
+            final username = _usernameController.text;
+            final password = _passwordController.text;
+            await postData({
+              'username': username,
+              'password': password,
+            });
           },
           style: ElevatedButton.styleFrom(
             shape: const StadiumBorder(),
@@ -155,14 +148,16 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Dont have an account? "),
+        const Text("Don't have an account? "),
         TextButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const SignupPage()));
-            },
-            child: const Text("Sign Up",
-                style: TextStyle(color: Color.fromARGB(255, 47, 3, 245))))
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SignupPage()),
+            );
+          },
+          child: const Text("Sign Up", style: TextStyle(color: Color.fromARGB(255, 47, 3, 245))),
+        ),
       ],
     );
   }
