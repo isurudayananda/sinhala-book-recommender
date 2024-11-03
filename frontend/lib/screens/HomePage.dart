@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
           _books = books.map((book) {
             return {
               'title': book['Book_Name'],
+              'isbn': book['ISBN'],
               'author': book['Author'],
               'category': book['Category'],
               'url': book['URL'],
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> {
             ),
             itemCount: _books.length,
             itemBuilder: (BuildContext context, int index) {
-              final book = _books[index];
+              final book = _books[0];
               return GestureDetector(
                 onTap: () {
                   Navigator.push(

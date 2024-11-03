@@ -31,11 +31,14 @@ class BookDetails extends StatelessWidget {
           children: [
             // Book Image
             Center(
-              child: Image.asset(
-                book['image'],
+              child: Image.network(
+                book['image_url'] ?? '',
                 height: 250,
                 width: 150,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.image, size: 150);
+                },
               ),
             ),
             const SizedBox(height: 20),
@@ -48,58 +51,44 @@ class BookDetails extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            // Book Rating
+            // Book Author
             Row(
               children: [
                 const Text(
-                  "Rating: ",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  book['rating'].toString(),
-                  style: const TextStyle(fontSize: 18),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            // Book Author
-            Row(
-              children: const [
-                Text(
                   "Author: ",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  "Mahinda Prasad Masimbula",
-                  style: TextStyle(fontSize: 18),
+                  book['author'] ?? 'Unknown',
+                  style: const TextStyle(fontSize: 18),
                 ),
               ],
             ),
             const SizedBox(height: 10),
             // Book ISBN
             Row(
-              children: const [
-                Text(
+              children: [
+                const Text(
                   "ISBN: ",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  "9789550980000",
-                  style: TextStyle(fontSize: 18),
+                  book['isbn'].toString(),
+                  style: const TextStyle(fontSize: 18),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            // Book Categories
+            // Book Category
             Row(
-              children: const [
-                Text(
-                  "Categories: ",
+              children: [
+                const Text(
+                  "Category: ",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  "Sinhala Literature",
-                  style: TextStyle(fontSize: 18),
+                  book['category'] ?? 'Not specified',
+                  style: const TextStyle(fontSize: 18),
                 ),
               ],
             ),
@@ -108,10 +97,10 @@ class BookDetails extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  _launchURL(context, "https://grantha.lk/senkottan-mahinda-prasad-masimbula-santhawa-prakashana.html");
+                  _launchURL(context, book['url'] ?? '');
                 },
                 style: ElevatedButton.styleFrom(
-                   backgroundColor:  const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+                  backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
                   foregroundColor: const Color.fromARGB(255, 47, 3, 245),
                 ),
                 child: const Text("Buy Now"),
