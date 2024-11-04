@@ -18,7 +18,6 @@ class Book:
             "Author": self.author,
             "URL": self.url,
             "Category": self.categories,
-            "img_url": self.img_url
         }
 
     @classmethod
@@ -30,5 +29,4 @@ class Book:
             author=data.get("Author"),
             url=data.get("URL"),
             categories=data.get("Category"),
-            img_url=data.get("img_url")
         )
