@@ -34,7 +34,10 @@ book_collection = mydb[book_collection_name]
 # User operations
 def insert_user(user):
     if isinstance(user, User):
-        user_collection.insert_one(user.to_dict())
+        user_dict = user.to_dict()
+        if '_id' in user_dict:
+            user_dict.pop('_id')  # Remove _id if present
+        user_collection.insert_one(user_dict)
     else:
         raise TypeError("Expected a User instance")
 

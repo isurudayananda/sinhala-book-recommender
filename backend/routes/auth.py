@@ -39,6 +39,9 @@ async def register_user(
         username: str = Form(...),
         email: str = Form(...),
         password: str = Form(...),
+        gender: str = Form(...),
+        age: int = Form(...),
+        interested_categories: str = Form(...)
 ):
     if user_exists(username):
         raise HTTPException(
@@ -50,6 +53,9 @@ async def register_user(
         username=username,
         email=email,
         hashed_password=hashed_password,
+        gender=gender,
+        age=age,
+        interested_categories=interested_categories
     )
     add_new_user(user)
     return user

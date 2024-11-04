@@ -11,8 +11,7 @@ class User:
         self.interested_categories = interested_categories
 
     def to_dict(self):
-        return {
-            "_id": self._id,
+        user_dict = {
             "username": self.username,
             "hashed_password": self.hashed_password,
             "email": self.email,
@@ -20,6 +19,9 @@ class User:
             "age": self.age,
             "interested_categories": self.interested_categories
         }
+        if self._id is not None:
+            user_dict["_id"] = self._id
+        return user_dict
 
     @classmethod
     def from_dict(cls, data):
