@@ -23,6 +23,28 @@ class _HomePageState extends State<HomePage> {
     _fetchRecommendations();
   }
 
+  Future<List<Map<String, dynamic>>> fetchSimilarBooks(String bookName) async {
+    var dio = Dio();
+    try {
+      final response = await dio.post(
+        'http://localhost:8000/api/books/get-similar',
+        options: Options(
+          contentType: 'application/x-www-form-urlencoded',
+        ),
+        data: {'book_name': bookName},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        throw Exception('Failed to load similar books');
+      }
+    } catch (e) {
+      throw Exception('Error fetching similar books: $e');
+    }
+  }
+
   Future<void> _fetchRecommendations() async {
     final token = Provider.of<AuthState>(context, listen: false).token;
     if (token == null) {
@@ -48,11 +70,11 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _books = books.map((book) {
             return {
-              'title': book['Book_Name'],
-              'isbn': book['ISBN'],
-              'author': book['Author'],
-              'category': book['Category'],
-              'url': book['URL'],
+              'Book_Name': book['Book_Name'],
+              'ISBN': book['ISBN'],
+              'Author': book['Author'],
+              'Category': book['Category'],
+              'URL': book['URL'],
               'image_url': book['image_url'],
             };
           }).toList();
@@ -111,15 +133,23 @@ class _HomePageState extends State<HomePage> {
             ),
             itemCount: _books.length,
             itemBuilder: (BuildContext context, int index) {
-              final book = _books[0];
+              final book = _books[index]; // Fixed book access here
               return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BookDetails(book: book),
-                    ),
-                  );
+                onTap: () async {
+                  try {
+                    // Fetch similar books
+                    List<Map<String, dynamic>> similarBooks = await fetchSimilarBooks(book['Book_Name']);
+
+                    // Navigate to BookDetails with the book and similar books
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BookDetails(book: book, similarBooks: similarBooks),
+                      ),
+                    );
+                  } catch (e) {
+                    _showSnackBar('Error fetching similar books: $e');
+                  }
                 },
                 child: Card(
                   elevation: 4,
@@ -138,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          book['title'],
+                          book['Book_Name'],
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
