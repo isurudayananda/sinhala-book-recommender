@@ -5,7 +5,6 @@ import 'package:login_signup/screens/SignupPage.dart';
 import 'package:login_signup/screens/HomePage.dart'; 
 import 'package:provider/provider.dart';
 
-
 class AuthState with ChangeNotifier {
   String? _token;
 
@@ -18,10 +17,17 @@ class AuthState with ChangeNotifier {
 }
 
 void main() {
+  bool devicePre = true; // Set this to true to enable DevicePreview
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthState(),
-      child: MyApp(),
+      child: devicePre
+          ? DevicePreview(
+              enabled: true,
+              builder: (context) => const MyApp(),
+            )
+          : const MyApp(),
     ),
   );
 }
@@ -31,7 +37,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var devicePre = true;
     return MaterialApp(
       useInheritedMediaQuery: true, // Required for DevicePreview
       debugShowCheckedModeBanner: false,
