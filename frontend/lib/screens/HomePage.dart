@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'BookDetails.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
+import 'LoginPage.dart'; // Ensure this path matches the location of your LoginPage file
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.preferences}) : super(key: key);
@@ -92,6 +93,13 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  void _logOut(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,6 +130,16 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+        Center(
+          child: ElevatedButton(
+            onPressed: () => _logOut(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+              foregroundColor: const Color.fromARGB(255, 47, 3, 245),
+            ),
+            child: const Text("Log Out"),
+          ),
+        ),
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.all(10.0),
@@ -133,7 +151,7 @@ class _HomePageState extends State<HomePage> {
             ),
             itemCount: _books.length,
             itemBuilder: (BuildContext context, int index) {
-              final book = _books[index]; // Fixed book access here
+              final book = _books[index];
               return GestureDetector(
                 onTap: () async {
                   try {
