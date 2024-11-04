@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'LoginPage.dart';
 
-// Import the login page here
-// import 'path_to_your_login_page.dart';
-
 class BookDetails extends StatelessWidget {
   final Map<String, dynamic> book;
   final List<Map<String, dynamic>> similarBooks;
@@ -120,37 +117,38 @@ class BookDetails extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            // Buy Link
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  _launchURL(context, book['URL'] ?? ''); // Handle null URL
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
-                  foregroundColor: const Color.fromARGB(255, 47, 3, 245),
+            // Buttons Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Buy Link Button
+                ElevatedButton(
+                  onPressed: () {
+                    _launchURL(context, book['URL'] ?? ''); // Handle null URL
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+                    foregroundColor: const Color.fromARGB(255, 47, 3, 245),
+                  ),
+                  child: const Text("Buy Now"),
                 ),
-                child: const Text("Buy Now"),
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Log Out Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(), // Replace with your login page widget
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
-                  foregroundColor: const Color.fromARGB(255, 47, 3, 245),
+                // Log Out Button
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(), // Replace with your login page widget
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+                    foregroundColor: const Color.fromARGB(255, 47, 3, 245),
+                  ),
+                  child: const Text("Log Out"),
                 ),
-                child: const Text("Log Out"),
-              ),
+              ],
             ),
             const SizedBox(height: 20),
             // Similar Books Section
