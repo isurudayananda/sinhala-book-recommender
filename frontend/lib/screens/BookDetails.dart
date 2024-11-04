@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,6 +16,28 @@ class BookDetails extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Could not open the link")),
       );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchSimilarBooks(String bookName) async {
+    var dio = Dio();
+    try {
+      final response = await dio.post(
+        'http://localhost:8000/api/books/get-similar',
+        options: Options(
+          contentType: 'application/x-www-form-urlencoded',
+        ),
+        data: {'book_name': bookName},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        throw Exception('Failed to load similar books');
+      }
+    } catch (e) {
+      throw Exception('Error fetching similar books: $e');
     }
   }
 
@@ -126,11 +149,14 @@ class BookDetails extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final similarBook = similarBooks[index];
                   return GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      // populate similar books
+                      var similar = await fetchSimilarBooks(similarBook['Book_Name']).then((value) => value);
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BookDetails(book: similarBook, similarBooks: []), // Pass empty for further similar books
+                          builder: (context) => BookDetails(book: similarBook, similarBooks: similar), // Pass empty for further similar books
                         ),
                       );
                     },
