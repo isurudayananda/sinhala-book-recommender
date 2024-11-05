@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'HomePage.dart'; // Import the HomePage widget
 
@@ -13,7 +14,11 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   String? _selectedGender;
-  String? _selectedAgeRange;
+  int? _age;
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   final List<String> _categories = [
     'Translations', 'Novels', 'Biographies', 'Adventure', 'Child',
@@ -22,7 +27,43 @@ class _SignupPageState extends State<SignupPage> {
   ];
 
   List<String> _selectedCategories = [];
-  final List<String> _ageRanges = ['18-24', '25-34', '35-44', '45-54', '55+'];
+
+  Future<void> _registerUser() async {
+    try {
+      final dio = Dio();
+      final response = await dio.post(
+        'http://localhost:8000/api/auth/register',
+        data: {
+          'username': _usernameController.text,
+          'password': _passwordController.text,
+          'email': _emailController.text,
+          'gender': _selectedGender,
+          'age': _age,
+          'interested_categories': _selectedCategories.join(', '),
+        },
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(preferences: _selectedCategories),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registration failed")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +104,7 @@ class _SignupPageState extends State<SignupPage> {
                           Column(
                             children: [
                               TextField(
+                                controller: _usernameController,
                                 decoration: InputDecoration(
                                   hintText: "Username",
                                   border: OutlineInputBorder(
@@ -76,6 +118,7 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                               const SizedBox(height: 20),
                               TextField(
+                                controller: _emailController,
                                 decoration: InputDecoration(
                                   hintText: "Email",
                                   border: OutlineInputBorder(
@@ -89,6 +132,7 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                               const SizedBox(height: 20),
                               TextField(
+                                controller: _passwordController,
                                 decoration: InputDecoration(
                                   hintText: "Password",
                                   border: OutlineInputBorder(
@@ -113,6 +157,7 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                               const SizedBox(height: 20),
                               TextField(
+                                controller: _confirmPasswordController,
                                 decoration: InputDecoration(
                                   hintText: "Confirm Password",
                                   border: OutlineInputBorder(
@@ -170,10 +215,9 @@ class _SignupPageState extends State<SignupPage> {
                                 ],
                               ),
                               const SizedBox(height: 20),
-                              DropdownButtonFormField<String>(
-                                value: _selectedAgeRange,
+                              TextField(
                                 decoration: InputDecoration(
-                                  hintText: "Select Age Range",
+                                  hintText: "Enter Age",
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(18),
                                     borderSide: BorderSide.none,
@@ -181,15 +225,10 @@ class _SignupPageState extends State<SignupPage> {
                                   fillColor: Colors.purple.withOpacity(0.1),
                                   filled: true,
                                 ),
-                                items: _ageRanges.map((String ageRange) {
-                                  return DropdownMenuItem<String>(
-                                    value: ageRange,
-                                    child: Text(ageRange),
-                                  );
-                                }).toList(),
+                                keyboardType: TextInputType.number,
                                 onChanged: (value) {
                                   setState(() {
-                                    _selectedAgeRange = value;
+                                    _age = int.tryParse(value);
                                   });
                                 },
                               ),
@@ -237,7 +276,7 @@ class _SignupPageState extends State<SignupPage> {
                         ],
                       ),
 
-                      const SizedBox(height: 20), // Add some space before the buttons
+                      const SizedBox(height: 20),
 
                       // Buttons
                       Row(
@@ -250,21 +289,15 @@ class _SignupPageState extends State<SignupPage> {
                                   pageIndex += 1;
                                 });
                               } else {
-                                // Pass the selected categories to HomePage on signing up
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HomePage(preferences: _selectedCategories),
-                                  ),
-                                );
+                                _registerUser();
                               }
                             },
                             child: Text(pageIndex < 2 ? " Next " : " Sign Up "),
                             style: ElevatedButton.styleFrom(
                               shape: const StadiumBorder(),
                               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                               backgroundColor:  const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
-                                foregroundColor: const Color.fromARGB(255, 47, 3, 245),
+                              backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
+                              foregroundColor: const Color.fromARGB(255, 47, 3, 245),
                             ),
                           ),
                         ],

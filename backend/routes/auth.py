@@ -10,23 +10,6 @@ from auth.hashing import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, create_
 from models.user_model import User
 from services.user_service import add_new_user, user_exists
 
-"""
-    API router for auth endpoint
-    
-    Attributes:
-        router (APIRouter): the router for the endpoint
-
-    Methods:
-        [POST] /api/auth/register
-        register_user: the endpoint for registering a new user
-
-        [POST] /api/auth/login
-        login_for_access_token: the endpoint for logging in a user
-
-        [POST] /api/auth/logout
-        logout: the endpoint for logging out a user
-"""
-
 router = APIRouter(
     prefix="/api/auth",
     tags=["auth"],
