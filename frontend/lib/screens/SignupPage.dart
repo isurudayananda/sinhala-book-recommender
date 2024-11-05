@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'HomePage.dart'; // Import the HomePage widget
+import 'package:login_signup/screens/LoginPage.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -50,7 +50,7 @@ class _SignupPageState extends State<SignupPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomePage(preferences: _selectedCategories),
+            builder: (context) => LoginPage(),
           ),
         );
       } else {
