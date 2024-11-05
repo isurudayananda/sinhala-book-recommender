@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'BookDetails.dart';
+import 'Results.dart'; // Import Results page
+import 'LoginPage.dart'; // Import LoginPage for logout functionality
 import 'package:provider/provider.dart';
 import '../main.dart';
 
@@ -16,6 +18,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> _books = [];
   bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -63,10 +66,10 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        
+
         // Wrap the data in a list if the response is a single object
         final books = data is List ? data : [data];
-        
+
         setState(() {
           _books = books.map((book) {
             return {
@@ -92,6 +95,14 @@ class _HomePageState extends State<HomePage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  void _logout() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +123,40 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Search field and button
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: "Search categories",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  final query = _searchController.text;
+                  if (query.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ResultsPage(searchQuery: query),
+                      ),
+                    );
+                  }
+                },
+                child: const Text("Search"),
+              ),
+            ],
+          ),
+        ),
         const Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
@@ -133,14 +178,11 @@ class _HomePageState extends State<HomePage> {
             ),
             itemCount: _books.length,
             itemBuilder: (BuildContext context, int index) {
-              final book = _books[index]; // Fixed book access here
+              final book = _books[index];
               return GestureDetector(
                 onTap: () async {
                   try {
-                    // Fetch similar books
                     List<Map<String, dynamic>> similarBooks = await fetchSimilarBooks(book['Book_Name']);
-
-                    // Navigate to BookDetails with the book and similar books
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -183,7 +225,18 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
+        // Log Out Button
+        Center(
+          child: ElevatedButton(
+            onPressed: _logout,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
+            ),
+            child: const Text("Log Out", style: TextStyle(fontSize: 18)),
+          ),
+        ),
+        const SizedBox(height: 20), // Additional spacing for layout
       ],
     );
   }
-} 
+}
