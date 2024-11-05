@@ -17,21 +17,24 @@ router = APIRouter(
 async def get_recommend_auth(
     token: str = Depends(oauth2_scheme)
 ):
+    # Ensure the user is authenticated
     if await get_current_user(token) is None:
         raise credentials_exception
     
     current_user = await get_current_user(token)
-    book = get_recommendations(current_user.age, current_user.gender)[0]
+    # Get the top 3 book recommendations based on user's age and gender
+    recommended_books = get_recommendations(current_user.age, current_user.gender)[:4]
     
-    # Assume get_book_info_by_name returns a list of book details
+    # Gather details for each recommended book
     book_details = []
-    book_info = get_book_info_by_name(book)
-    if book_info:
-        # Build URL for image based on ISBN
-        book_info_dict = book_info.to_dict()
-        book_info_dict['image_url'] = f"http://localhost:8000/images/{book_info_dict['ISBN']}.jpg"
-        book_details.append(book_info_dict)
-        
+    for book in recommended_books:
+        book_info = get_book_info_by_name(book)
+        if book_info:
+            # Convert to dict and add image URL for each book
+            book_info_dict = book_info.to_dict()
+            book_info_dict['image_url'] = f"http://localhost:8000/images/{book_info_dict['ISBN']}.jpg"
+            book_details.append(book_info_dict)
+    
     print(book_details)
     
     return book_details
