@@ -3,11 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'LoginPage.dart';
 
-class BookDetails extends StatelessWidget {
+class BookDetails extends StatefulWidget {
   final Map<String, dynamic> book;
   final List<Map<String, dynamic>> similarBooks;
 
   const BookDetails({Key? key, required this.book, required this.similarBooks}) : super(key: key);
+
+  @override
+  _BookDetailsState createState() => _BookDetailsState();
+}
+
+class _BookDetailsState extends State<BookDetails> {
+  bool isLiked = false;
 
   void _launchURL(BuildContext context, String url) async {
     final Uri uri = Uri.parse(url);
@@ -42,11 +49,27 @@ class BookDetails extends StatelessWidget {
     }
   }
 
+  void toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+    });
+
+    // Optionally, send the like status to the backend
+    Dio().post(
+      'http://localhost:8000/api/books/like',
+      data: {'book_id': widget.book['id'], 'liked': isLiked},
+    ).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating like status: $error")),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(book['Book_Name'] ?? 'Unknown Book'), // Handle null title
+        title: Text(widget.book['Book_Name'] ?? 'Unknown Book'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -56,7 +79,7 @@ class BookDetails extends StatelessWidget {
             // Book Image
             Center(
               child: Image.network(
-                book['image_url'] ?? '',
+                widget.book['image_url'] ?? '',
                 height: 250,
                 width: 150,
                 fit: BoxFit.cover,
@@ -68,7 +91,7 @@ class BookDetails extends StatelessWidget {
             const SizedBox(height: 20),
             // Book Title
             Text(
-              book['Book_Name'] ?? 'Unknown Book', // Handle null title
+              widget.book['Book_Name'] ?? 'Unknown Book',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -83,7 +106,7 @@ class BookDetails extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  book['Author'] ?? 'Unknown',
+                  widget.book['Author'] ?? 'Unknown',
                   style: const TextStyle(fontSize: 18),
                 ),
               ],
@@ -97,7 +120,7 @@ class BookDetails extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  book['ISBN']?.toString() ?? 'N/A', // Handle null ISBN
+                  widget.book['ISBN']?.toString() ?? 'N/A',
                   style: const TextStyle(fontSize: 18),
                 ),
               ],
@@ -111,8 +134,25 @@ class BookDetails extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  book['Category'] ?? 'Not specified',
+                  widget.book['Category'] ?? 'Not specified',
                   style: const TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Like Button
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.red,
+                  ),
+                  onPressed: toggleLike,
+                ),
+                const Text(
+                  "Like this book",
+                  style: TextStyle(fontSize: 16),
                 ),
               ],
             ),
@@ -124,7 +164,7 @@ class BookDetails extends StatelessWidget {
                 // Buy Link Button
                 ElevatedButton(
                   onPressed: () {
-                    _launchURL(context, book['URL'] ?? ''); // Handle null URL
+                    _launchURL(context, widget.book['URL'] ?? '');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 10, 10, 10).withOpacity(0.1),
@@ -138,7 +178,7 @@ class BookDetails extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginPage(), // Replace with your login page widget
+                        builder: (context) => LoginPage(),
                       ),
                     );
                   },
@@ -166,18 +206,16 @@ class BookDetails extends StatelessWidget {
                   crossAxisSpacing: 10.0,
                   childAspectRatio: 2 / 3,
                 ),
-                itemCount: similarBooks.length,
+                itemCount: widget.similarBooks.length,
                 itemBuilder: (context, index) {
-                  final similarBook = similarBooks[index];
+                  final similarBook = widget.similarBooks[index];
                   return GestureDetector(
                     onTap: () async {
-                      // populate similar books
-                      var similar = await fetchSimilarBooks(similarBook['Book_Name']).then((value) => value);
-
+                      var similar = await fetchSimilarBooks(similarBook['Book_Name']);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BookDetails(book: similarBook, similarBooks: similar), // Pass empty for further similar books
+                          builder: (context) => BookDetails(book: similarBook, similarBooks: similar),
                         ),
                       );
                     },
@@ -198,7 +236,7 @@ class BookDetails extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              similarBook['Book_Name'] ?? 'Unknown', // Handle null name
+                              similarBook['Book_Name'] ?? 'Unknown',
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
