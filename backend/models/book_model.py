@@ -9,6 +9,7 @@ class Book:
         self.url = url
         self.categories = categories
         self.img_url = img_url
+        self.num_reviews = 0
 
     def to_dict(self):
         return {
@@ -18,6 +19,8 @@ class Book:
             "Author": self.author,
             "URL": self.url,
             "Category": self.categories,
+            "img_url": self.img_url,
+            "num_reviews": self.num_reviews
         }
 
     @classmethod
@@ -28,5 +31,5 @@ class Book:
             isbn=data.get("ISBN"),
             author=data.get("Author"),
             url=data.get("URL"),
-            categories=data.get("Category"),
+            categories=data.get("Category")
         )

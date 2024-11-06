@@ -57,6 +57,24 @@ def insert_book(book):
         book_collection.insert_one(book.to_dict())
     else:
         raise TypeError("Expected a Book instance")
+    
+    
+def search_book(query):
+    print('searching: ' + query + '...')
+    # Perform a case-insensitive search on 'name' and 'author', and exclude '_id' from the results
+    search_results = book_collection.find({
+        "$or": [
+            {"Book_Name": {"$regex": query, "$options": "i"}},  # Case-insensitive search on 'name'
+            {"Author": {"$regex": query, "$options": "i"}}      # Case-insensitive search on 'author'
+        ]
+    }, {
+        "_id": 0  # Exclude '_id' field
+    })
+
+    # Convert search results to a list of Book instances (assuming Book has a from_dict method)
+    book_dict = [Book.from_dict(book) for book in search_results]
+
+    return book_dict
 
 
 def update_book(book_id, update_data):
@@ -68,6 +86,16 @@ def get_book(book_id):
     return Book.from_dict(book_data) if book_data else None
 
 
+def increment_book_reviews(isbn):
+    book_data = book_collection.find_one({"ISBN": int(isbn)})
+    if book_data:
+        new_num_reviews = book_data["num_reviews"] + 1
+        book_collection.update_one({"ISBN": int(isbn)}, {"$set": {"num_reviews": new_num_reviews}})
+        return True
+    else:
+        return False
+
+
 def get_book_info_by_name(book_name): 
     book_data = book_collection.find_one({"Book_Name": book_name})
     print(book_data)
@@ -76,5 +104,5 @@ def get_book_info_by_name(book_name):
 
 def get_book_by_isbn(isbn):
     book_data = book_collection.find_one({"ISBN": int(isbn)})
-    print(book_data)
+    print('-----' +book_data)
     return book_data if book_data else None

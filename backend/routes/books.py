@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Form
 
-from dao.db_con import get_book_info_by_name
+from dao.db_con import get_book_info_by_name, search_book
 from services.book_info_service import get_info
 from services.books_service import get_recommendations
 from services.similar_books_service import get_similar_books
@@ -60,3 +60,28 @@ async def get_book_info(
         isbn: str = Form(...)
 ):
     return dict(get_info(isbn))
+
+
+
+@router.post('/search')
+async def search_book_handler(
+    query: str = Form(...)
+):
+    search_results = search_book(query)
+    print(search_results)
+    return search_results
+
+
+@router.post('/increment-book-reviews')
+async def increment_book_reviews(
+        token: str = Depends(oauth2_scheme),
+        isbn: str = Form(...)
+):
+    if await get_current_user(token) is None:
+        raise credentials_exception
+    
+    if increment_book_reviews(isbn):
+        # TODO retrain knn
+        return "incremented successfully"
+    else:
+        return "book not found"

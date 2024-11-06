@@ -18,4 +18,4 @@ def get_book_info_by_name(book_name):
         del book_dict["_id"]
         return book_dict
     else:
-        return None
+        return None        
