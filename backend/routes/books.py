@@ -1,10 +1,19 @@
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, HTTPException
+import logging ,os
+logging.basicConfig(level=logging.INFO)
 
+from services.retrain import like_book
 from dao.db_con import get_book_info_by_name, search_book
 from services.book_info_service import get_info
 from services.books_service import get_recommendations
 from services.similar_books_service import get_similar_books
 from auth.authorize import get_current_user, oauth2_scheme, credentials_exception
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.staticfiles import StaticFiles
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 router = APIRouter(
     prefix="/api/books",
@@ -17,6 +26,7 @@ router = APIRouter(
 async def get_recommend_auth(
     token: str = Depends(oauth2_scheme)
 ):
+    
     # Ensure the user is authenticated
     if await get_current_user(token) is None:
         raise credentials_exception
@@ -70,6 +80,25 @@ async def search_book_handler(
     search_results = search_book(query)
     print(search_results)
     return search_results
+
+
+
+
+
+@router.post('/like')
+async def increment_book_reviews(
+    token: str = Depends(oauth2_scheme),
+    book_id: str = Form(...)
+):
+    print(token)
+    current_user = await get_current_user(token)
+    if current_user is None:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    print('current user: ' + str(current_user.age) + " - " + current_user.gender)
+    if like_book(book_id, current_user.age, current_user.gender):
+        return {"message": "Liked successfully"}
+    else:
+        return {"message": "Like unsuccessful"}
 
 
 @router.post('/increment-book-reviews')

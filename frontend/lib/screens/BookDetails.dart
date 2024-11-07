@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:login_signup/main.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'LoginPage.dart';
 
@@ -29,11 +31,15 @@ class _BookDetailsState extends State<BookDetails> {
 
   Future<List<Map<String, dynamic>>> fetchSimilarBooks(String bookName) async {
     var dio = Dio();
+    var token = Provider.of<AuthState>(context, listen: false).token;
     try {
       final response = await dio.post(
         'http://localhost:8000/api/books/get-similar',
         options: Options(
           contentType: 'application/x-www-form-urlencoded',
+          headers: {
+            'Authorization': 'Bearer $token', // Add Authorization header
+          },
         ),
         data: {'book_name': bookName},
       );
@@ -49,21 +55,40 @@ class _BookDetailsState extends State<BookDetails> {
     }
   }
 
-  void toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-    });
+ void toggleLike() async {
+  setState(() {
+    isLiked = !isLiked;
+  });
 
-    // Optionally, send the like status to the backend
-    Dio().post(
+  var token = Provider.of<AuthState>(context, listen: false).token;
+
+  try {
+    var response = await Dio().post(
       'http://localhost:8000/api/books/like',
-      data: {'book_id': widget.book['id'], 'liked': isLiked},
-    ).catchError((error) {
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token', // Ensure token is prefixed correctly
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      ),
+      data: {
+        'book_id': widget.book['id'].toString(), // Ensure book_id is sent as a string
+      },
+    );
+
+    if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating like status: $error")),
+        SnackBar(content: Text("Book liked successfully!")),
       );
-    });
+    } else {
+      throw Exception("Failed to like book");
+    }
+  } catch (error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error updating like status: $error")),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
