@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'BookDetails.dart';
 
 class ResultsPage extends StatefulWidget {
   final String searchQuery;
@@ -13,7 +14,7 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  List<dynamic> _searchResults = [];
+  List<Map<String, dynamic>> _searchResults = [];
 
   @override
   void initState() {
@@ -30,10 +31,35 @@ class _ResultsPageState extends State<ResultsPage> {
 
     if (response.statusCode == 200) {
       setState(() {
-        _searchResults = json.decode(response.body);
+        final data = json.decode(response.body);
+        _searchResults = List<Map<String, dynamic>>.from(data.map((book) {
+          return {
+            'Book_Name': book['book_name'],
+            'ISBN': book['isbn'],
+            'Author': book['author'],
+            'Category': book['categories'],
+            'URL': book['url'],
+            'image_url': book['img_url']
+          };
+        }));
       });
     } else {
       throw Exception('Failed to load search results');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchSimilarBooks(String bookName) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:8000/api/books/get-similar'),
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: {'book_name': bookName},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return List<Map<String, dynamic>>.from(data);
+    } else {
+      throw Exception('Failed to load similar books');
     }
   }
 
@@ -50,8 +76,26 @@ class _ResultsPageState extends State<ResultsPage> {
               itemBuilder: (context, index) {
                 final book = _searchResults[index];
                 return ListTile(
-                  title: Text(book['name'] ?? 'Unknown Title'),
-                  subtitle: Text(book['author'] ?? 'Unknown Author'),
+                  title: Text(book['Book_Name'] ?? 'Unknown Title'),
+                  subtitle: Text(book['Author'] ?? 'Unknown Author'),
+                  leading: book['image_url'] != null
+                      ? Image.network(book['image_url'], width: 50, height: 50, fit: BoxFit.cover)
+                      : const Icon(Icons.book, size: 50),
+                  onTap: () async {
+                    try {
+                      final similarBooks = await fetchSimilarBooks(book['Book_Name']);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BookDetails(book: book, similarBooks: similarBooks),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error fetching similar books: $e')),
+                      );
+                    }
+                  },
                 );
               },
             ),

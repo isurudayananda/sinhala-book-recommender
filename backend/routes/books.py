@@ -82,9 +82,6 @@ async def search_book_handler(
     return search_results
 
 
-
-
-
 @router.post('/like')
 async def increment_book_reviews(
     token: str = Depends(oauth2_scheme),
