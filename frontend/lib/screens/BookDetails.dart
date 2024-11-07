@@ -72,13 +72,13 @@ class _BookDetailsState extends State<BookDetails> {
         },
       ),
       data: {
-        'book_id': widget.book['id'].toString(), // Ensure book_id is sent as a string
+        'book_id': widget.book['Book_Name'].toString(), // Ensure book_id is sent as a string
       },
     );
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Book liked successfully!")),
+        SnackBar(content: Text("Book liked successfully!\nYour contribution helped making this platform better...")),
       );
     } else {
       throw Exception("Failed to like book");
