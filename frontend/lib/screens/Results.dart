@@ -23,30 +23,31 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Future<void> _fetchSearchResults() async {
-    final response = await http.post(
-      Uri.parse('http://localhost:8000/api/books/search'),
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: {'query': widget.searchQuery},
-    );
+  final response = await http.post(
+    Uri.parse('http://localhost:8000/api/books/search'),
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body: {'query': widget.searchQuery},
+  );
 
-    if (response.statusCode == 200) {
-      setState(() {
-        final data = json.decode(response.body);
-        _searchResults = List<Map<String, dynamic>>.from(data.map((book) {
-          return {
-            'Book_Name': book['book_name'],
-            'ISBN': book['isbn'],
-            'Author': book['author'],
-            'Category': book['categories'],
-            'URL': book['url'],
-            'image_url': book['img_url']
-          };
-        }));
-      });
-    } else {
-      throw Exception('Failed to load search results');
-    }
+  if (response.statusCode == 200) {
+    setState(() {
+      final data = json.decode(response.body);
+      _searchResults = List<Map<String, dynamic>>.from(data.map((book) {
+        return {
+          'Book_Name': book['Book_Name'],  // Changed to match the actual key
+          'ISBN': book['ISBN'],            // Changed to match the actual key
+          'Author': book['Author'],        // Changed to match the actual key
+          'Category': book['Category'],    // Changed to match the actual key
+          'URL': book['URL'],              // Changed to match the actual key
+          'image_url': book['image_url']   // Changed to match the actual key
+        };
+      }));
+    });
+  } else {
+    throw Exception('Failed to load search results');
   }
+}
+
 
   Future<List<Map<String, dynamic>>> fetchSimilarBooks(String bookName) async {
     final response = await http.post(

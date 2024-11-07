@@ -78,8 +78,12 @@ async def search_book_handler(
     query: str = Form(...)
 ):
     search_results = search_book(query)
-    print(search_results)
-    return search_results
+
+    # Convert each Book instance to a dictionary and return
+    search_results_with_images = [book for book in search_results]
+    print('-----------------------')
+    print(search_results_with_images)
+    return search_results_with_images
 
 
 @router.post('/like')

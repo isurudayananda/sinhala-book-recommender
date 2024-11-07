@@ -60,7 +60,7 @@ def insert_book(book):
     
     
 def search_book(query):
-    print('searching: ' + query + '...')
+    print(f"searching: {query}...")
     
     # Perform a case-insensitive search on 'Book_Name', 'Author', and 'Category', excluding '_id'
     name_author_results = book_collection.find({
@@ -79,16 +79,25 @@ def search_book(query):
         "_id": 0  # Exclude '_id' field
     })
 
-    # Convert search results to lists of Book instances
-    name_author_books = [Book.from_dict(book) for book in name_author_results]
-    category_books = [Book.from_dict(book) for book in category_results]
-
-    # Combine both lists and remove duplicates based on a unique attribute, e.g., 'ISBN'
-    combined_books = {book.isbn: book for book in name_author_books + category_books}
-
-    # Return the list of unique Book instances
-    return list(combined_books.values())
-
+    # Combine results and remove duplicates based on ISBN
+    combined_books = {book['ISBN']: book for book in name_author_results}
+    combined_books.update({book['ISBN']: book for book in category_results})
+    
+    # Format each book result to include 'image_url' and match the required structure
+    search_results = []
+    for book in combined_books.values():
+        formatted_book = {
+            'Book_Name': book.get('Book_Name', 'Unknown Title'),
+            'ISBN': book.get('ISBN', ''),
+            'Author': book.get('Author', 'Unknown Author'),
+            'Category': book.get('Category', ''),
+            'URL': book.get('URL', ''),
+            'image_url': f"http://localhost:8000/images/{book.get('ISBN', '')}.jpg",
+            'num_reviews': book.get('num_reviews', 0)
+        }
+        search_results.append(formatted_book)
+    
+    return search_results
 
 
 def update_book(book_id, update_data):
