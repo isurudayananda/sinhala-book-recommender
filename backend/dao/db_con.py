@@ -61,20 +61,34 @@ def insert_book(book):
     
 def search_book(query):
     print('searching: ' + query + '...')
-    # Perform a case-insensitive search on 'name' and 'author', and exclude '_id' from the results
-    search_results = book_collection.find({
+    
+    # Perform a case-insensitive search on 'Book_Name', 'Author', and 'Category', excluding '_id'
+    name_author_results = book_collection.find({
         "$or": [
-            {"Book_Name": {"$regex": query, "$options": "i"}},  # Case-insensitive search on 'name'
-            {"Author": {"$regex": query, "$options": "i"}}      # Case-insensitive search on 'author'
+            {"Book_Name": {"$regex": query, "$options": "i"}},  # Case-insensitive search on 'Book_Name'
+            {"Author": {"$regex": query, "$options": "i"}}      # Case-insensitive search on 'Author'
         ]
     }, {
         "_id": 0  # Exclude '_id' field
     })
 
-    # Convert search results to a list of Book instances (assuming Book has a from_dict method)
-    book_dict = [Book.from_dict(book) for book in search_results]
+    # Separate search specifically for categories
+    category_results = book_collection.find({
+        "Category": {"$regex": query, "$options": "i"}  # Case-insensitive search on 'Category'
+    }, {
+        "_id": 0  # Exclude '_id' field
+    })
 
-    return book_dict
+    # Convert search results to lists of Book instances
+    name_author_books = [Book.from_dict(book) for book in name_author_results]
+    category_books = [Book.from_dict(book) for book in category_results]
+
+    # Combine both lists and remove duplicates based on a unique attribute, e.g., 'ISBN'
+    combined_books = {book.isbn: book for book in name_author_books + category_books}
+
+    # Return the list of unique Book instances
+    return list(combined_books.values())
+
 
 
 def update_book(book_id, update_data):
